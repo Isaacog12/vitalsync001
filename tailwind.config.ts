@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Plus Jakarta Sans", "system-ui", "sans-serif"],
-        display: ["Plus Jakarta Sans", "system-ui", "sans-serif"],
+        sans: ["Exo 2", "system-ui", "sans-serif"],
+        display: ["Orbitron", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
       colors: {
@@ -74,6 +74,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Cyber neon colors
+        neon: {
+          cyan: "hsl(185 100% 50%)",
+          magenta: "hsl(280 100% 60%)",
+          pink: "hsl(350 100% 60%)",
+          green: "hsl(160 100% 45%)",
+          yellow: "hsl(45 100% 55%)",
+        },
         // Health-specific colors
         vital: {
           heart: "hsl(var(--heart-rate))",
@@ -99,15 +107,31 @@ export default {
         shimmer: {
           "100%": { transform: "translateX(100%)" },
         },
+        "pulse-glow": {
+          "0%, 100%": { boxShadow: "0 0 20px hsl(185 100% 50% / 0.3)" },
+          "50%": { boxShadow: "0 0 40px hsl(185 100% 50% / 0.6)" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         shimmer: "shimmer 2s infinite",
+        "pulse-glow": "pulse-glow 3s ease-in-out infinite",
+        float: "float 6s ease-in-out infinite",
       },
       boxShadow: {
-        glow: "0 0 20px hsl(var(--primary) / 0.2)",
-        "glow-lg": "0 0 40px hsl(var(--primary) / 0.3)",
+        glow: "0 0 30px hsl(var(--primary) / 0.3)",
+        "glow-lg": "0 0 50px hsl(var(--primary) / 0.4)",
+        neon: "0 0 40px hsl(185 100% 50% / 0.4), 0 0 80px hsl(280 100% 60% / 0.2)",
+        "neon-strong": "0 0 60px hsl(185 100% 50% / 0.6), 0 0 120px hsl(280 100% 60% / 0.4)",
+      },
+      backgroundImage: {
+        "grid-pattern": "linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px)",
+        "cyber-grid": "linear-gradient(to right, hsl(185 100% 50% / 0.05) 1px, transparent 1px), linear-gradient(to bottom, hsl(185 100% 50% / 0.05) 1px, transparent 1px)",
       },
     },
   },

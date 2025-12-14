@@ -2,120 +2,154 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @layer base {
   :root {
-    /* Healthcare-inspired color palette */
-    --background: 210 20% 98%;
-    --foreground: 210 40% 11%;
+    /* Futuristic Cyberpunk Light Theme */
+    --background: 220 25% 97%;
+    --foreground: 220 50% 10%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 210 40% 11%;
+    --card: 220 20% 99%;
+    --card-foreground: 220 50% 10%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 210 40% 11%;
+    --popover: 220 20% 99%;
+    --popover-foreground: 220 50% 10%;
 
-    /* Deep teal primary - trust & medical */
-    --primary: 180 70% 30%;
-    --primary-foreground: 0 0% 100%;
+    /* Neon Cyan Primary */
+    --primary: 185 100% 40%;
+    --primary-foreground: 220 50% 5%;
 
-    /* Soft mint secondary */
-    --secondary: 168 50% 94%;
-    --secondary-foreground: 180 70% 25%;
+    /* Electric Blue Secondary */
+    --secondary: 210 100% 95%;
+    --secondary-foreground: 185 100% 30%;
 
-    /* Muted grays */
-    --muted: 210 20% 94%;
-    --muted-foreground: 210 15% 45%;
+    /* Muted with cyber undertone */
+    --muted: 220 20% 92%;
+    --muted-foreground: 220 15% 45%;
 
-    /* Light teal accent */
-    --accent: 174 60% 88%;
-    --accent-foreground: 180 70% 20%;
+    /* Holographic accent */
+    --accent: 270 80% 92%;
+    --accent-foreground: 270 70% 40%;
 
-    /* Alert colors */
-    --destructive: 0 72% 51%;
+    /* Alert colors - neon variants */
+    --destructive: 350 90% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
+    --warning: 45 100% 50%;
+    --warning-foreground: 45 100% 10%;
 
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 100%;
+    --success: 160 100% 40%;
+    --success-foreground: 160 100% 5%;
 
-    --info: 199 89% 48%;
+    --info: 200 100% 50%;
     --info-foreground: 0 0% 100%;
 
-    --border: 210 20% 90%;
-    --input: 210 20% 90%;
-    --ring: 180 70% 30%;
+    --border: 220 20% 88%;
+    --input: 220 20% 88%;
+    --ring: 185 100% 40%;
 
     --radius: 0.75rem;
 
-    /* Custom health-specific colors */
-    --heart-rate: 0 84% 60%;
-    --blood-pressure: 262 83% 58%;
-    --oxygen: 199 89% 48%;
-    --temperature: 38 92% 50%;
+    /* Health-specific neon colors */
+    --heart-rate: 350 90% 55%;
+    --blood-pressure: 280 100% 60%;
+    --oxygen: 200 100% 50%;
+    --temperature: 35 100% 55%;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(180 70% 30%), hsl(174 60% 40%));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(210 20% 98%));
-    --gradient-hero: linear-gradient(135deg, hsl(180 70% 30%), hsl(199 89% 48%));
-    --gradient-alert: linear-gradient(135deg, hsl(0 72% 51%), hsl(38 92% 50%));
+    /* Cyber gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(185 100% 40%), hsl(200 100% 50%));
+    --gradient-card: linear-gradient(180deg, hsl(220 20% 99%), hsl(220 25% 96%));
+    --gradient-hero: linear-gradient(135deg, hsl(185 100% 35%), hsl(280 100% 50%));
+    --gradient-neon: linear-gradient(135deg, hsl(185 100% 50%), hsl(280 100% 60%), hsl(350 90% 55%));
+    --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
 
-    /* Shadows */
+    /* Cyber shadows */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --shadow-glow: 0 0 20px hsl(180 70% 30% / 0.2);
+    --shadow-glow: 0 0 30px hsl(185 100% 40% / 0.3);
+    --shadow-neon: 0 0 40px hsl(185 100% 50% / 0.4), 0 0 80px hsl(280 100% 60% / 0.2);
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 210 40% 11%;
-    --sidebar-primary: 180 70% 30%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 174 60% 92%;
-    --sidebar-accent-foreground: 180 70% 20%;
-    --sidebar-border: 210 20% 92%;
-    --sidebar-ring: 180 70% 30%;
+    --sidebar-background: 220 20% 99%;
+    --sidebar-foreground: 220 50% 10%;
+    --sidebar-primary: 185 100% 40%;
+    --sidebar-primary-foreground: 220 50% 5%;
+    --sidebar-accent: 185 100% 95%;
+    --sidebar-accent-foreground: 185 100% 30%;
+    --sidebar-border: 220 20% 92%;
+    --sidebar-ring: 185 100% 40%;
   }
 
   .dark {
-    --background: 210 40% 8%;
-    --foreground: 210 20% 98%;
+    /* Futuristic Cyberpunk Dark Theme */
+    --background: 230 25% 6%;
+    --foreground: 185 20% 95%;
 
-    --card: 210 35% 12%;
-    --card-foreground: 210 20% 98%;
+    --card: 230 25% 10%;
+    --card-foreground: 185 20% 95%;
 
-    --popover: 210 35% 12%;
-    --popover-foreground: 210 20% 98%;
+    --popover: 230 25% 10%;
+    --popover-foreground: 185 20% 95%;
 
-    --primary: 174 60% 45%;
-    --primary-foreground: 210 40% 8%;
+    /* Neon Cyan Primary */
+    --primary: 185 100% 50%;
+    --primary-foreground: 230 25% 5%;
 
-    --secondary: 210 30% 18%;
-    --secondary-foreground: 174 60% 75%;
+    /* Electric Blue Secondary */
+    --secondary: 230 30% 15%;
+    --secondary-foreground: 185 100% 70%;
 
-    --muted: 210 30% 18%;
-    --muted-foreground: 210 15% 60%;
+    /* Muted with cyber undertone */
+    --muted: 230 25% 15%;
+    --muted-foreground: 220 15% 55%;
 
-    --accent: 210 30% 22%;
-    --accent-foreground: 174 60% 75%;
+    /* Holographic accent */
+    --accent: 270 60% 20%;
+    --accent-foreground: 270 100% 80%;
 
-    --destructive: 0 62% 45%;
+    /* Alert colors - neon variants */
+    --destructive: 350 100% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 30% 20%;
-    --input: 210 30% 20%;
-    --ring: 174 60% 45%;
+    --warning: 45 100% 55%;
+    --warning-foreground: 45 100% 10%;
 
-    --sidebar-background: 210 35% 10%;
-    --sidebar-foreground: 210 20% 98%;
-    --sidebar-primary: 174 60% 45%;
-    --sidebar-primary-foreground: 210 40% 8%;
-    --sidebar-accent: 210 30% 18%;
-    --sidebar-accent-foreground: 174 60% 75%;
-    --sidebar-border: 210 30% 18%;
-    --sidebar-ring: 174 60% 45%;
+    --success: 160 100% 45%;
+    --success-foreground: 160 100% 5%;
+
+    --info: 200 100% 55%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 230 25% 18%;
+    --input: 230 25% 18%;
+    --ring: 185 100% 50%;
+
+    /* Health-specific neon colors */
+    --heart-rate: 350 100% 60%;
+    --blood-pressure: 280 100% 65%;
+    --oxygen: 200 100% 55%;
+    --temperature: 35 100% 60%;
+
+    /* Cyber gradients - dark mode */
+    --gradient-primary: linear-gradient(135deg, hsl(185 100% 45%), hsl(200 100% 55%));
+    --gradient-card: linear-gradient(180deg, hsl(230 25% 12%), hsl(230 25% 8%));
+    --gradient-hero: linear-gradient(135deg, hsl(185 100% 40%), hsl(280 100% 55%));
+    --gradient-neon: linear-gradient(135deg, hsl(185 100% 50%), hsl(280 100% 60%), hsl(350 100% 60%));
+    --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+
+    /* Cyber shadows - dark mode */
+    --shadow-glow: 0 0 40px hsl(185 100% 50% / 0.4);
+    --shadow-neon: 0 0 60px hsl(185 100% 50% / 0.5), 0 0 120px hsl(280 100% 60% / 0.3);
+
+    --sidebar-background: 230 25% 8%;
+    --sidebar-foreground: 185 20% 95%;
+    --sidebar-primary: 185 100% 50%;
+    --sidebar-primary-foreground: 230 25% 5%;
+    --sidebar-accent: 230 30% 15%;
+    --sidebar-accent-foreground: 185 100% 70%;
+    --sidebar-border: 230 25% 15%;
+    --sidebar-ring: 185 100% 50%;
   }
 }
 
@@ -129,7 +163,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-semibold tracking-tight;
+    @apply font-display font-bold tracking-tight;
   }
 }
 
@@ -146,12 +180,25 @@
     background: var(--gradient-card);
   }
 
+  .gradient-neon {
+    background: var(--gradient-neon);
+  }
+
   .shadow-glow {
     box-shadow: var(--shadow-glow);
   }
 
+  .shadow-neon {
+    box-shadow: var(--shadow-neon);
+  }
+
   .glass {
-    @apply bg-card/80 backdrop-blur-xl border border-border/50;
+    @apply bg-card/60 backdrop-blur-2xl border border-border/30;
+    background: var(--gradient-glass);
+  }
+
+  .glass-dark {
+    @apply bg-background/80 backdrop-blur-2xl border border-primary/20;
   }
 
   .text-gradient {
@@ -159,36 +206,92 @@
     background: var(--gradient-primary);
   }
 
-  /* Vital card colors */
+  .text-neon {
+    @apply bg-clip-text text-transparent;
+    background: var(--gradient-neon);
+  }
+
+  /* Futuristic vital card colors */
   .vital-heart {
-    @apply bg-red-50 border-red-200;
+    @apply border-destructive/30 bg-destructive/5;
     --vital-color: hsl(var(--heart-rate));
   }
 
   .vital-bp {
-    @apply bg-violet-50 border-violet-200;
+    @apply border-accent/30 bg-accent/10;
     --vital-color: hsl(var(--blood-pressure));
   }
 
   .vital-oxygen {
-    @apply bg-blue-50 border-blue-200;
+    @apply border-info/30 bg-info/5;
     --vital-color: hsl(var(--oxygen));
   }
 
   .vital-temp {
-    @apply bg-amber-50 border-amber-200;
+    @apply border-warning/30 bg-warning/5;
     --vital-color: hsl(var(--temperature));
   }
 
-  /* Animations */
+  /* Cyber border glow */
+  .border-glow {
+    @apply relative;
+  }
+
+  .border-glow::before {
+    content: '';
+    @apply absolute inset-0 rounded-lg opacity-0 transition-opacity duration-300;
+    background: var(--gradient-neon);
+    filter: blur(8px);
+    z-index: -1;
+  }
+
+  .border-glow:hover::before {
+    @apply opacity-50;
+  }
+
+  /* Scan line effect */
+  .scan-lines {
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 255, 255, 0.02) 2px,
+      rgba(0, 255, 255, 0.02) 4px
+    );
+  }
+
+  /* Holographic shimmer */
+  .holographic {
+    background: linear-gradient(
+      135deg,
+      hsl(185 100% 50% / 0.1) 0%,
+      hsl(280 100% 60% / 0.1) 25%,
+      hsl(350 100% 60% / 0.1) 50%,
+      hsl(185 100% 50% / 0.1) 75%,
+      hsl(280 100% 60% / 0.1) 100%
+    );
+    background-size: 200% 200%;
+    animation: holographic-shift 8s ease-in-out infinite;
+  }
+
+  @keyframes holographic-shift {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  /* Enhanced animations */
   @keyframes pulse-ring {
     0% {
       transform: scale(0.95);
       opacity: 1;
     }
     50% {
-      transform: scale(1.1);
-      opacity: 0.5;
+      transform: scale(1.05);
+      opacity: 0.7;
     }
     100% {
       transform: scale(0.95);
@@ -201,14 +304,14 @@
       transform: translateY(0);
     }
     50% {
-      transform: translateY(-10px);
+      transform: translateY(-8px);
     }
   }
 
   @keyframes slide-up {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(30px);
     }
     to {
       opacity: 1;
@@ -230,13 +333,60 @@
       transform: scale(1);
     }
     25% {
-      transform: scale(1.1);
+      transform: scale(1.15);
     }
     50% {
       transform: scale(1);
     }
     75% {
-      transform: scale(1.05);
+      transform: scale(1.08);
+    }
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% {
+      box-shadow: 0 0 20px hsl(185 100% 50% / 0.3);
+    }
+    50% {
+      box-shadow: 0 0 40px hsl(185 100% 50% / 0.6), 0 0 60px hsl(280 100% 60% / 0.3);
+    }
+  }
+
+  @keyframes data-stream {
+    0% {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  @keyframes cyber-flicker {
+    0%, 100% {
+      opacity: 1;
+    }
+    92% {
+      opacity: 1;
+    }
+    93% {
+      opacity: 0.8;
+    }
+    94% {
+      opacity: 1;
+    }
+    96% {
+      opacity: 0.9;
+    }
+    97% {
+      opacity: 1;
     }
   }
 
@@ -249,15 +399,27 @@
   }
 
   .animate-slide-up {
-    animation: slide-up 0.5s ease-out forwards;
+    animation: slide-up 0.6s ease-out forwards;
   }
 
   .animate-fade-in {
-    animation: fade-in 0.3s ease-out forwards;
+    animation: fade-in 0.4s ease-out forwards;
   }
 
   .animate-heartbeat {
     animation: heartbeat 1s ease-in-out infinite;
+  }
+
+  .animate-glow-pulse {
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+
+  .animate-data-stream {
+    animation: data-stream 3s linear infinite;
+  }
+
+  .animate-cyber-flicker {
+    animation: cyber-flicker 4s linear infinite;
   }
 
   /* Stagger animations */
@@ -266,4 +428,5 @@
   .stagger-3 { animation-delay: 0.3s; }
   .stagger-4 { animation-delay: 0.4s; }
   .stagger-5 { animation-delay: 0.5s; }
+  .stagger-6 { animation-delay: 0.6s; }
 }
