@@ -30,7 +30,7 @@ export default function DoctorPatients() {
     try {
       const { data, error } = await supabase
         .from('patients')
-        .select('id, room_number, profiles:patients_profile_id_fkey (full_name)')
+        .select('id, room_number, profiles!patients_profile_id_fkey (full_name)')
         .order('created_at', { ascending: false });
 
       if (error) throw error;

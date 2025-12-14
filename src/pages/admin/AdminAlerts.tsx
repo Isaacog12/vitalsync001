@@ -52,7 +52,7 @@ export default function AdminAlerts() {
           *,
           patients!inner (
             room_number,
-            profiles:patients_profile_id_fkey (full_name)
+            profiles!patients_profile_id_fkey (full_name)
           )
         `)
         .order('created_at', { ascending: false });
