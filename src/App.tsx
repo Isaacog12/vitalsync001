@@ -12,7 +12,15 @@ import StaffManagement from "./pages/admin/StaffManagement";
 import AdminPatients from "./pages/admin/AdminPatients";
 import AdminAlerts from "./pages/admin/AdminAlerts";
 import AdminSettings from "./pages/admin/AdminSettings";
-// Doctor pages
+// Hospital Doctor pages
+import HospitalDoctorDashboard from "./pages/hospital-doctor/HospitalDoctorDashboard";
+// Online Doctor pages
+import OnlineDoctorDashboard from "./pages/online-doctor/OnlineDoctorDashboard";
+// Nurse pages
+import NurseDashboard from "./pages/nurse/NurseDashboard";
+// Pharmacist pages
+import PharmacistDashboard from "./pages/pharmacist/PharmacistDashboard";
+// Legacy Doctor pages (redirect to hospital doctor)
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 import DoctorPatients from "./pages/doctor/DoctorPatients";
 import DoctorMessages from "./pages/doctor/DoctorMessages";
@@ -45,7 +53,28 @@ const App = () => (
             <Route path="/admin/alerts" element={<AdminAlerts />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
             
-            {/* Doctor routes */}
+            {/* Hospital Doctor routes */}
+            <Route path="/hospital-doctor" element={<HospitalDoctorDashboard />} />
+            <Route path="/hospital-doctor/patients" element={<DoctorPatients />} />
+            <Route path="/hospital-doctor/messages" element={<DoctorMessages />} />
+            <Route path="/hospital-doctor/calls" element={<DoctorCalls />} />
+            <Route path="/hospital-doctor/alerts" element={<DoctorAlerts />} />
+            
+            {/* Online Doctor routes */}
+            <Route path="/online-doctor" element={<OnlineDoctorDashboard />} />
+            <Route path="/online-doctor/patients" element={<DoctorPatients />} />
+            <Route path="/online-doctor/messages" element={<DoctorMessages />} />
+            <Route path="/online-doctor/calls" element={<DoctorCalls />} />
+            
+            {/* Nurse routes */}
+            <Route path="/nurse" element={<NurseDashboard />} />
+            <Route path="/nurse/patients" element={<DoctorPatients />} />
+            <Route path="/nurse/alerts" element={<DoctorAlerts />} />
+            
+            {/* Pharmacist routes */}
+            <Route path="/pharmacist" element={<PharmacistDashboard />} />
+            
+            {/* Legacy Doctor routes (for backwards compatibility) */}
             <Route path="/doctor" element={<DoctorDashboard />} />
             <Route path="/doctor/patients" element={<DoctorPatients />} />
             <Route path="/doctor/messages" element={<DoctorMessages />} />

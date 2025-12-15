@@ -3,7 +3,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-type AppRole = 'admin' | 'doctor' | 'patient';
+export type AppRole = 'admin' | 'doctor' | 'hospital_doctor' | 'online_doctor' | 'nurse' | 'pharmacist' | 'patient';
 
 interface Profile {
   id: string;
@@ -89,13 +89,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
 
-        // Defer profile fetch to avoid deadlock
         if (session?.user) {
           setTimeout(async () => {
             const profileData = await fetchProfile(session.user.id);
@@ -112,7 +110,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     );
 
-    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
