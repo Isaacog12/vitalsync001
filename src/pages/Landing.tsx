@@ -123,9 +123,8 @@ export default function Landing() {
             </div>
             
             <h1 className="text-5xl lg:text-7xl font-display font-bold mb-6 leading-tight">
-              <span className="text-foreground">The Future of</span>
+              <span className="text-foreground">The Future of Healthcare</span>
               <br />
-              <span className="text-gradient">Healthcare</span>
               <span className="text-foreground"> is Here</span>
             </h1>
             
