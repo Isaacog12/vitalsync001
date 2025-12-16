@@ -62,7 +62,7 @@ export default function NurseDashboard() {
       const [patientsRes, alertsRes] = await Promise.all([
         supabase
           .from('patients')
-          .select('id, room_number, profiles(full_name)')
+          .select('id, room_number, profiles!profile_id(full_name)')
           .not('room_number', 'is', null)
           .limit(10),
         supabase
@@ -110,26 +110,26 @@ export default function NurseDashboard() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard
-            title="Assigned Patients"
-            value={patients.length.toString()}
+            label="Assigned Patients"
+            value={patients.length}
             icon={<Users className="h-5 w-5" />}
-            variant="primary"
+            variant="default"
           />
           <StatsCard
-            title="Vital Checks Today"
-            value="24"
+            label="Vital Checks Today"
+            value={24}
             icon={<Heart className="h-5 w-5" />}
             variant="success"
           />
           <StatsCard
-            title="Active Alerts"
-            value={alerts.length.toString()}
+            label="Active Alerts"
+            value={alerts.length}
             icon={<Bell className="h-5 w-5" />}
             variant={alerts.length > 0 ? 'danger' : 'success'}
           />
           <StatsCard
-            title="Critical Alerts"
-            value={criticalAlerts.toString()}
+            label="Critical Alerts"
+            value={criticalAlerts}
             icon={<AlertTriangle className="h-5 w-5" />}
             variant={criticalAlerts > 0 ? 'danger' : 'success'}
           />
