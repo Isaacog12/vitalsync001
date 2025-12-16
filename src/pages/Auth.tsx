@@ -50,6 +50,18 @@ export default function Auth() {
         case 'doctor':
           navigate('/doctor');
           break;
+        case 'hospital_doctor':
+          navigate('/hospital-doctor');
+          break;
+        case 'online_doctor':
+          navigate('/online-doctor');
+          break;
+        case 'nurse':
+          navigate('/nurse');
+          break;
+        case 'pharmacist':
+          navigate('/pharmacist');
+          break;
         case 'patient':
           navigate('/patient');
           break;
