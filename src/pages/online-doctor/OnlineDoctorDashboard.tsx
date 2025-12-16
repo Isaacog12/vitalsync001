@@ -79,29 +79,29 @@ export default function OnlineDoctorDashboard() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard
-            title="Scheduled Consultations"
-            value={scheduledCount.toString()}
+            label="Scheduled Consultations"
+            value={scheduledCount}
             icon={<Calendar className="h-5 w-5" />}
-            variant="primary"
+            variant="warning"
           />
           <StatsCard
-            title="Completed Today"
-            value={completedCount.toString()}
+            label="Completed Today"
+            value={completedCount}
             icon={<Video className="h-5 w-5" />}
             variant="success"
           />
           <StatsCard
-            title="Earnings Today"
+            label="Earnings Today"
             value="$450"
             icon={<DollarSign className="h-5 w-5" />}
-            trend={{ value: 12, isPositive: true }}
-            variant="info"
+            trend={{ value: 12, label: 'from yesterday' }}
+            variant="success"
           />
           <StatsCard
-            title="Patient Messages"
-            value="8"
+            label="Patient Messages"
+            value={8}
             icon={<MessageSquare className="h-5 w-5" />}
-            variant="secondary"
+            variant="default"
           />
         </div>
 

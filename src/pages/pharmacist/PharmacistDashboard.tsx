@@ -95,28 +95,28 @@ export default function PharmacistDashboard() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard
-            title="Pending Prescriptions"
-            value={pendingCount.toString()}
+            label="Pending Prescriptions"
+            value={pendingCount}
             icon={<Clock className="h-5 w-5" />}
             variant={pendingCount > 0 ? 'warning' : 'success'}
           />
           <StatsCard
-            title="Dispensed Today"
-            value={dispensedCount.toString()}
+            label="Dispensed Today"
+            value={dispensedCount}
             icon={<CheckCircle className="h-5 w-5" />}
             variant="success"
           />
           <StatsCard
-            title="Low Stock Items"
-            value="3"
+            label="Low Stock Items"
+            value={3}
             icon={<AlertTriangle className="h-5 w-5" />}
             variant="danger"
           />
           <StatsCard
-            title="Orders Ready"
-            value="5"
+            label="Orders Ready"
+            value={5}
             icon={<Truck className="h-5 w-5" />}
-            variant="info"
+            variant="warning"
           />
         </div>
 

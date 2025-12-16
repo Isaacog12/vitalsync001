@@ -38,11 +38,11 @@ export default function HospitalDoctorDashboard() {
 
   const fetchData = async () => {
     try {
-      const [patientsRes, alertsRes] = await Promise.all([
-        supabase
-          .from('patients')
-          .select('id, room_number, profiles(full_name)')
-          .limit(10),
+        const [patientsRes, alertsRes] = await Promise.all([
+          supabase
+            .from('patients')
+            .select('id, room_number, profiles!profile_id(full_name)')
+            .limit(10),
         supabase
           .from('alerts')
           .select('id')
@@ -87,29 +87,29 @@ export default function HospitalDoctorDashboard() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard
-            title="In-Patients"
-            value={inPatients.length.toString()}
+            label="In-Patients"
+            value={inPatients.length}
             icon={<BedDouble className="h-5 w-5" />}
-            trend={{ value: 5, isPositive: true }}
-            variant="primary"
+            trend={{ value: 5, label: 'this week' }}
+            variant="success"
           />
           <StatsCard
-            title="Out-Patients"
-            value={outPatients.length.toString()}
+            label="Out-Patients"
+            value={outPatients.length}
             icon={<UserCheck className="h-5 w-5" />}
-            variant="secondary"
+            variant="default"
           />
           <StatsCard
-            title="Active Alerts"
-            value={alertCount.toString()}
+            label="Active Alerts"
+            value={alertCount}
             icon={<AlertTriangle className="h-5 w-5" />}
             variant={alertCount > 0 ? 'danger' : 'success'}
           />
           <StatsCard
-            title="Prescriptions Today"
-            value="12"
+            label="Prescriptions Today"
+            value={12}
             icon={<FileText className="h-5 w-5" />}
-            variant="info"
+            variant="warning"
           />
         </div>
 
