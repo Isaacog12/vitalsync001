@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -35,6 +36,7 @@ interface Alert {
 
 export default function NurseDashboard() {
   const { profile } = useAuth();
+  const navigate = useNavigate();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,6 +101,10 @@ export default function NurseDashboard() {
             <Button variant="outline" className="border-primary/50">
               <ClipboardList className="mr-2 h-4 w-4" />
               Nursing Notes
+            </Button>
+            <Button variant="outline" className="border-primary/50" onClick={() => navigate('/nurse/add-patient')}>
+              <Users className="mr-2 h-4 w-4" />
+              Add New Patient
             </Button>
             <Button className="gradient-primary text-primary-foreground">
               <Activity className="mr-2 h-4 w-4" />

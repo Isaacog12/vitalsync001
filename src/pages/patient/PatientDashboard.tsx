@@ -4,7 +4,7 @@ import VitalCard from '@/components/dashboard/VitalCard';
 import AIInsightsPanel from '@/components/ai/AIInsightsPanel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, Activity, Droplets, Thermometer, Phone, MessageSquare, User, Zap, Loader2 } from 'lucide-react';
+import { Heart, Activity, Droplets, Thermometer, Phone, MessageSquare, User, Zap, Loader2, Stethoscope } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -112,11 +112,25 @@ export default function PatientDashboard() {
         <div className="relative">
           <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-lg blur-xl opacity-50" />
           <div className="relative">
-            <h1 className="text-4xl font-display font-bold text-foreground flex items-center gap-3">
-              <Zap className="h-8 w-8 text-primary animate-pulse" />
-              Health Dashboard
-            </h1>
-            <p className="text-muted-foreground mt-1">Real-time health monitoring from connected devices</p>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h1 className="text-4xl font-display font-bold text-foreground flex items-center gap-3">
+                  <Zap className="h-8 w-8 text-primary animate-pulse" />
+                  Health Dashboard
+                </h1>
+                <p className="text-muted-foreground mt-1">Real-time health monitoring from connected devices</p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/patient/browse-doctors')}
+                  className="hover:shadow-glow"
+                >
+                  <Stethoscope className="h-4 w-4 mr-2" />
+                  Book Appointment
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
 

@@ -18,6 +18,7 @@ import HospitalDoctorDashboard from "./pages/hospital-doctor/HospitalDoctorDashb
 import OnlineDoctorDashboard from "./pages/online-doctor/OnlineDoctorDashboard";
 // Nurse pages
 import NurseDashboard from "./pages/nurse/NurseDashboard";
+import AddPatient from "./pages/nurse/AddPatient";
 // Pharmacist pages
 import PharmacistDashboard from "./pages/pharmacist/PharmacistDashboard";
 // Legacy Doctor pages (redirect to hospital doctor)
@@ -31,6 +32,10 @@ import PatientDashboard from "./pages/patient/PatientDashboard";
 import PatientVitals from "./pages/patient/PatientVitals";
 import PatientMessages from "./pages/patient/PatientMessages";
 import PatientContact from "./pages/patient/PatientContact";
+import BrowseDoctors from "./pages/patient/BrowseDoctors";
+import BookAppointment from "./pages/patient/BookAppointment";
+import PatientAppointments from "./pages/patient/PatientAppointments";
+import Teleconsultation from "./pages/patient/Teleconsultation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -68,6 +73,7 @@ const App = () => (
             
             {/* Nurse routes */}
             <Route path="/nurse" element={<NurseDashboard />} />
+            <Route path="/nurse/add-patient" element={<AddPatient />} />
             <Route path="/nurse/patients" element={<DoctorPatients />} />
             <Route path="/nurse/alerts" element={<DoctorAlerts />} />
             
@@ -86,6 +92,10 @@ const App = () => (
             <Route path="/patient/vitals" element={<PatientVitals />} />
             <Route path="/patient/messages" element={<PatientMessages />} />
             <Route path="/patient/contact" element={<PatientContact />} />
+            <Route path="/patient/browse-doctors" element={<BrowseDoctors />} />
+            <Route path="/patient/book-appointment/:doctorId" element={<BookAppointment />} />
+            <Route path="/patient/appointments" element={<PatientAppointments />} />
+            <Route path="/patient/teleconsultation/:consultationId" element={<Teleconsultation />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>

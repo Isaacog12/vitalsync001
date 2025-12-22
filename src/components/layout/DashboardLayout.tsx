@@ -54,6 +54,8 @@ const doctorNavItems: NavItem[] = [
 const patientNavItems: NavItem[] = [
   { label: 'Dashboard', href: '/patient', icon: <LayoutDashboard className="h-5 w-5" /> },
   { label: 'My Vitals', href: '/patient/vitals', icon: <Activity className="h-5 w-5" /> },
+  { label: 'Browse Doctors', href: '/patient/browse-doctors', icon: <Stethoscope className="h-5 w-5" /> },
+  { label: 'My Appointments', href: '/patient/appointments', icon: <UserPlus className="h-5 w-5" /> },
   { label: 'Messages', href: '/patient/messages', icon: <MessageSquare className="h-5 w-5" /> },
   { label: 'Contact Doctor', href: '/patient/contact', icon: <Phone className="h-5 w-5" /> },
 ];
