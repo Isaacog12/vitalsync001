@@ -1,14 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import StatsCard from '@/components/dashboard/StatsCard';
 import AlertItem from '@/components/dashboard/AlertItem';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+// IMPORT THE NEW COMPONENT
+import { CreateDoctorDialog } from '@/components/dashboard/CreateDoctorDialog';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, Heart, UserPlus, AlertTriangle, Stethoscope, Activity, Loader2 } from 'lucide-react';
+import { Users, Heart, AlertTriangle, Activity, Loader2, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -37,9 +35,9 @@ interface Alert {
 
 export default function AdminDashboard() {
   const { toast } = useToast();
-  const [isCreating, setIsCreating] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  
   const [stats, setStats] = useState<DashboardStats>({
     totalPatients: 0,
     totalDoctors: 0,
@@ -47,179 +45,115 @@ export default function AdminDashboard() {
     activeAlerts: 0,
     criticalPatients: 0,
   });
+  
   const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [newDoctor, setNewDoctor] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    department: '',
-    specialization: '',
-  });
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async (showToast = false) => {
+    if (showToast) setRefreshing(true);
+    
     try {
       const [patientsRes, doctorsRes, nursesRes, alertsRes] = await Promise.all([
-        supabase.from('patients').select('id', { count: 'exact' }),
-        supabase.from('profiles').select('id', { count: 'exact' }).in('role', ['doctor', 'hospital_doctor', 'online_doctor']),
-        supabase.from('profiles').select('id', { count: 'exact' }).eq('role', 'nurse'),
-        supabase.from('alerts').select(`
-          id, alert_type, severity, message, created_at, is_acknowledged,
-          patients!alerts_patient_id_fkey(room_number, profiles!profile_id(full_name))
-        `).eq('is_acknowledged', false).order('created_at', { ascending: false }).limit(5),
+        supabase.from('patients').select('id', { count: 'exact', head: true }),
+        supabase.from('profiles').select('id', { count: 'exact', head: true }).in('role', ['doctor', 'hospital_doctor', 'online_doctor']),
+        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'nurse'),
+        supabase.from('alerts')
+          .select(`
+            id, alert_type, severity, message, created_at, is_acknowledged,
+            patients!alerts_patient_id_fkey(room_number, profiles!profile_id(full_name))
+          `)
+          .eq('is_acknowledged', false)
+          .order('created_at', { ascending: false })
+          .limit(5),
       ]);
+
+      const alertsData = (alertsRes.data as unknown as Alert[]) || [];
 
       setStats({
         totalPatients: patientsRes.count || 0,
         totalDoctors: doctorsRes.count || 0,
         totalNurses: nursesRes.count || 0,
-        activeAlerts: alertsRes.data?.length || 0,
-        criticalPatients: alertsRes.data?.filter(a => a.severity === 'critical').length || 0,
+        activeAlerts: alertsData.length,
+        criticalPatients: alertsData.filter(a => a.severity === 'critical').length,
       });
 
-      if (alertsRes.data) {
-        setAlerts(alertsRes.data as Alert[]);
+      setAlerts(alertsData);
+
+      if (showToast) {
+        toast({ title: "Dashboard updated" });
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
-  };
+  }, [toast]);
 
-  const handleCreateDoctor = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsCreating(true);
+  // Initial fetch and Realtime Subscription
+  useEffect(() => {
+    fetchDashboardData();
 
-    try {
-      const { error } = await supabase.auth.signUp({
-        email: newDoctor.email,
-        password: newDoctor.password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`,
-          data: {
-            full_name: newDoctor.fullName,
-            role: 'doctor',
-          },
-        },
-      });
+    // Listen for new alerts in real-time
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'alerts' },
+        (payload) => {
+          toast({
+            title: "New Alert Received",
+            description: "Dashboard has been updated.",
+            variant: "destructive",
+          });
+          fetchDashboardData();
+        }
+      )
+      .subscribe();
 
-      if (error) throw error;
-
-      toast({
-        title: 'Doctor account created',
-        description: `Account for ${newDoctor.fullName} has been created successfully.`,
-      });
-
-      setDialogOpen(false);
-      setNewDoctor({ fullName: '', email: '', password: '', department: '', specialization: '' });
-      fetchDashboardData();
-    } catch (error: any) {
-      toast({
-        title: 'Failed to create account',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } finally {
-      setIsCreating(false);
-    }
-  };
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchDashboardData, toast]);
 
   const handleAcknowledgeAlert = async (alertId: string) => {
+    // Optimistic update
+    setAlerts(prev => prev.filter(a => a.id !== alertId));
+    setStats(prev => ({ ...prev, activeAlerts: Math.max(0, prev.activeAlerts - 1) }));
+
     try {
       await supabase
         .from('alerts')
         .update({ is_acknowledged: true })
         .eq('id', alertId);
       
-      fetchDashboardData();
       toast({ title: 'Alert acknowledged' });
     } catch (error) {
       console.error('Error acknowledging alert:', error);
+      fetchDashboardData(); // Revert on error
     }
   };
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
             <p className="text-muted-foreground">System overview and staff management</p>
           </div>
           
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="hero" size="lg">
-                <UserPlus className="h-5 w-5 mr-2" />
-                Add Doctor
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Create Doctor Account</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleCreateDoctor} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input
-                    id="name"
-                    placeholder="Dr. Jane Smith"
-                    value={newDoctor.fullName}
-                    onChange={e => setNewDoctor(prev => ({ ...prev, fullName: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="doctor@vitalsync.com"
-                    value={newDoctor.email}
-                    onChange={e => setNewDoctor(prev => ({ ...prev, email: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={newDoctor.password}
-                    onChange={e => setNewDoctor(prev => ({ ...prev, password: e.target.value }))}
-                    required
-                    minLength={6}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="department">Department</Label>
-                  <Select
-                    value={newDoctor.department}
-                    onValueChange={value => setNewDoctor(prev => ({ ...prev, department: value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select department" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="cardiology">Cardiology</SelectItem>
-                      <SelectItem value="neurology">Neurology</SelectItem>
-                      <SelectItem value="pediatrics">Pediatrics</SelectItem>
-                      <SelectItem value="emergency">Emergency</SelectItem>
-                      <SelectItem value="general">General Medicine</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button type="submit" className="w-full" variant="hero" disabled={isCreating}>
-                  {isCreating ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Create Account'}
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={() => fetchDashboardData(true)}
+              disabled={refreshing}
+            >
+              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            </Button>
+            {/* The new component is used here */}
+            <CreateDoctorDialog onSuccess={() => fetchDashboardData(true)} />
+          </div>
         </div>
 
         {/* Stats */}
@@ -255,10 +189,19 @@ export default function AdminDashboard() {
         {/* Recent Alerts */}
         <Card className="glass-card">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-destructive" />
-              Recent Critical Alerts
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
+                Recent Critical Alerts
+              </CardTitle>
+              {stats.activeAlerts > 0 && (
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-destructive"></span>
+                </span>
+              )}
+            </div>
+            <CardDescription>Alerts requiring immediate attention</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             {loading ? (
@@ -267,7 +210,8 @@ export default function AdminDashboard() {
                 Loading...
               </div>
             ) : alerts.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
+              <div className="text-center py-8 text-muted-foreground bg-muted/30 rounded-lg">
+                <Activity className="h-8 w-8 mx-auto mb-2 opacity-50" />
                 No active alerts
               </div>
             ) : (
