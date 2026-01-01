@@ -4,10 +4,14 @@ import VitalCard from '@/components/dashboard/VitalCard';
 import AIInsightsPanel from '@/components/ai/AIInsightsPanel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, Activity, Droplets, Thermometer, Phone, MessageSquare, User, Zap, Loader2, Stethoscope } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Heart, Activity, Droplets, Thermometer, Phone, MessageSquare, User, Zap, Loader2, Stethoscope, Mail, RefreshCw, Building, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 interface Vital {
   heart_rate: number | null;
@@ -19,16 +23,31 @@ interface Vital {
 }
 
 interface Doctor {
+  id: string;
   full_name: string;
   specialization: string | null;
+  email: string;
+  phone: string | null;
+  department: string | null;
+}
+
+interface Patient {
+  id: string;
+  assigned_doctor_id: string | null;
 }
 
 export default function PatientDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [vitals, setVitals] = useState<Vital | null>(null);
   const [doctor, setDoctor] = useState<Doctor | null>(null);
+  const [patient, setPatient] = useState<Patient | null>(null);
   const [loading, setLoading] = useState(true);
+  const [changeRequestOpen, setChangeRequestOpen] = useState(false);
+  const [changeReason, setChangeReason] = useState('');
+  const [submittingRequest, setSubmittingRequest] = useState(false);
+  const [hasPendingRequest, setHasPendingRequest] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
@@ -51,39 +70,85 @@ export default function PatientDashboard() {
   const fetchData = async () => {
     try {
       // Get patient and their assigned doctor
-      const { data: patient } = await supabase
+      const { data: patientData } = await supabase
         .from('patients')
         .select('id, assigned_doctor_id')
         .eq('user_id', user?.id)
         .maybeSingle();
 
-      if (patient) {
+      if (patientData) {
+        setPatient(patientData);
+        
         // Fetch latest vitals
         const { data: vitalData } = await supabase
           .from('vitals')
           .select('*')
-          .eq('patient_id', patient.id)
+          .eq('patient_id', patientData.id)
           .order('recorded_at', { ascending: false })
           .limit(1)
           .maybeSingle();
 
         if (vitalData) setVitals(vitalData);
 
-        // Fetch assigned doctor
-        if (patient.assigned_doctor_id) {
+        // Fetch assigned doctor with contact info
+        if (patientData.assigned_doctor_id) {
           const { data: doctorData } = await supabase
             .from('profiles')
-            .select('full_name, specialization')
-            .eq('id', patient.assigned_doctor_id)
+            .select('id, full_name, specialization, email, phone, department')
+            .eq('id', patientData.assigned_doctor_id)
             .maybeSingle();
 
           if (doctorData) setDoctor(doctorData);
         }
+
+        // Check for pending doctor change requests
+        const { data: pendingRequest } = await supabase
+          .from('doctor_change_requests')
+          .select('id')
+          .eq('patient_id', patientData.id)
+          .eq('status', 'pending')
+          .maybeSingle();
+
+        setHasPendingRequest(!!pendingRequest);
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRequestDoctorChange = async () => {
+    if (!patient || !changeReason.trim()) return;
+
+    setSubmittingRequest(true);
+    try {
+      const { error } = await supabase
+        .from('doctor_change_requests')
+        .insert({
+          patient_id: patient.id,
+          current_doctor_id: patient.assigned_doctor_id,
+          reason: changeReason.trim(),
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Request Submitted',
+        description: 'Your doctor change request has been submitted for review.',
+      });
+
+      setChangeRequestOpen(false);
+      setChangeReason('');
+      setHasPendingRequest(true);
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to submit request',
+        variant: 'destructive',
+      });
+    } finally {
+      setSubmittingRequest(false);
     }
   };
 
@@ -212,48 +277,123 @@ export default function PatientDashboard() {
                 } : undefined} />
               )}
 
-              {/* Care Team */}
+              {/* Assigned Doctor Card */}
               <Card className="border-primary/20 bg-card/60 backdrop-blur-xl">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 font-display">
-                    <User className="h-5 w-5 text-primary" />
-                    Your Care Team
+                    <Stethoscope className="h-5 w-5 text-primary" />
+                    Your Assigned Doctor
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {doctor ? (
-                    <div className="flex items-center justify-between p-4 rounded-xl bg-background/40 border border-border/30">
-                      <div className="flex items-center gap-3">
-                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground flex items-center justify-center font-display font-bold text-lg">
+                    <>
+                      <div className="flex items-start gap-4 p-4 rounded-xl bg-background/40 border border-border/30">
+                        <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground flex items-center justify-center font-display font-bold text-xl shrink-0">
                           {doctor.full_name.split(' ').map(n => n[0]).join('')}
                         </div>
-                        <div>
-                          <p className="font-semibold">{doctor.full_name}</p>
-                          <p className="text-sm text-muted-foreground">{doctor.specialization || 'Physician'}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-lg">{doctor.full_name}</p>
+                          <p className="text-sm text-muted-foreground">{doctor.specialization || 'General Physician'}</p>
+                          
+                          <div className="mt-3 space-y-1.5">
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Mail className="h-3.5 w-3.5" />
+                              <span className="truncate">{doctor.email}</span>
+                            </div>
+                            {doctor.phone && (
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <Phone className="h-3.5 w-3.5" />
+                                <span>{doctor.phone}</span>
+                              </div>
+                            )}
+                            {doctor.department && (
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <Building className="h-3.5 w-3.5" />
+                                <span>{doctor.department}</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
-                      <div className="flex gap-2">
+
+                      {/* Action Buttons */}
+                      <div className="flex flex-wrap gap-2">
                         <Button 
-                          size="icon" 
                           variant="secondary" 
-                          className="hover:shadow-glow"
+                          size="sm"
                           onClick={() => navigate('/patient/contact')}
                         >
-                          <Phone className="h-4 w-4" />
+                          <Phone className="h-4 w-4 mr-2" />
+                          Call
                         </Button>
                         <Button 
-                          size="icon" 
                           variant="secondary"
-                          className="hover:shadow-glow"
+                          size="sm"
                           onClick={() => navigate('/patient/messages')}
                         >
-                          <MessageSquare className="h-4 w-4" />
+                          <MessageSquare className="h-4 w-4 mr-2" />
+                          Message
                         </Button>
+                        
+                        {hasPendingRequest ? (
+                          <Button variant="outline" size="sm" disabled className="ml-auto">
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Change Requested
+                          </Button>
+                        ) : (
+                          <Dialog open={changeRequestOpen} onOpenChange={setChangeRequestOpen}>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" size="sm" className="ml-auto">
+                                <RefreshCw className="h-4 w-4 mr-2" />
+                                Request Change
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Request Doctor Change</DialogTitle>
+                              </DialogHeader>
+                              <div className="space-y-4 py-4">
+                                <p className="text-sm text-muted-foreground">
+                                  Please provide a reason for requesting a different doctor. Your request will be reviewed by our team.
+                                </p>
+                                <div className="space-y-2">
+                                  <Label htmlFor="reason">Reason for Change</Label>
+                                  <Textarea
+                                    id="reason"
+                                    placeholder="Please explain why you'd like to change your assigned doctor..."
+                                    value={changeReason}
+                                    onChange={(e) => setChangeReason(e.target.value)}
+                                    rows={4}
+                                  />
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <Button variant="outline" onClick={() => setChangeRequestOpen(false)}>
+                                  Cancel
+                                </Button>
+                                <Button 
+                                  onClick={handleRequestDoctorChange}
+                                  disabled={!changeReason.trim() || submittingRequest}
+                                >
+                                  {submittingRequest ? (
+                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                  ) : null}
+                                  Submit Request
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        )}
                       </div>
-                    </div>
+                    </>
                   ) : (
-                    <div className="p-4 rounded-xl bg-background/40 border border-border/30 text-center">
+                    <div className="p-6 rounded-xl bg-background/40 border border-border/30 text-center space-y-3">
+                      <User className="h-12 w-12 mx-auto text-muted-foreground/50" />
                       <p className="text-muted-foreground">No doctor assigned yet</p>
+                      <Button onClick={() => navigate('/patient/browse-doctors')}>
+                        Browse Doctors
+                      </Button>
                     </div>
                   )}
                 </CardContent>
