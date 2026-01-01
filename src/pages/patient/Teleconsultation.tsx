@@ -25,7 +25,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface Consultation {
   id: string;
-  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+  status: string;
   started_at: string | null;
   doctor: {
     full_name: string;

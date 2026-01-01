@@ -21,6 +21,7 @@ export function CreateDoctorDialog({ onSuccess }: CreateDoctorDialogProps) {
     email: '',
     password: '',
     department: '',
+    doctorType: 'hospital_doctor', // hospital_doctor or online_doctor
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,14 +29,15 @@ export function CreateDoctorDialog({ onSuccess }: CreateDoctorDialogProps) {
     setLoading(true);
 
     try {
-      // Create Auth User
+      // Create Auth User with doctor role (hospital_doctor or online_doctor)
       const { error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
           data: {
             full_name: formData.fullName,
-            role: 'doctor',
+            role: formData.doctorType, // Use hospital_doctor or online_doctor
+            department: formData.department,
           },
         },
       });
@@ -48,7 +50,7 @@ export function CreateDoctorDialog({ onSuccess }: CreateDoctorDialogProps) {
       });
 
       // Reset form and close dialog
-      setFormData({ fullName: '', email: '', password: '', department: '' });
+      setFormData({ fullName: '', email: '', password: '', department: '', doctorType: 'hospital_doctor' });
       setOpen(false);
       
       // Trigger refresh in parent
@@ -109,6 +111,21 @@ export function CreateDoctorDialog({ onSuccess }: CreateDoctorDialogProps) {
               required
               minLength={6}
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="doctorType">Doctor Type</Label>
+            <Select
+              value={formData.doctorType}
+              onValueChange={(val) => setFormData({ ...formData, doctorType: val })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="hospital_doctor">Hospital Doctor</SelectItem>
+                <SelectItem value="online_doctor">Online Doctor</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="department">Department</Label>
