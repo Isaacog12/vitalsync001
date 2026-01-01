@@ -57,7 +57,7 @@ export default function StaffManagement() {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .in('role', ['doctor', 'admin', 'nurse']) // Added nurse support
+        .in('role', ['hospital_doctor', 'online_doctor', 'admin', 'nurse'])
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -114,7 +114,7 @@ export default function StaffManagement() {
                 <Stethoscope className="h-6 w-6" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{staff.filter(s => s.role === 'doctor').length}</p>
+                <p className="text-2xl font-bold">{staff.filter(s => s.role === 'hospital_doctor' || s.role === 'online_doctor').length}</p>
                 <p className="text-xs text-muted-foreground uppercase font-medium">Doctors</p>
               </div>
             </CardContent>
@@ -158,7 +158,8 @@ export default function StaffManagement() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Roles</SelectItem>
-                    <SelectItem value="doctor">Doctors</SelectItem>
+                    <SelectItem value="hospital_doctor">Hospital Doctors</SelectItem>
+                    <SelectItem value="online_doctor">Online Doctors</SelectItem>
                     <SelectItem value="admin">Admins</SelectItem>
                     <SelectItem value="nurse">Nurses</SelectItem>
                   </SelectContent>

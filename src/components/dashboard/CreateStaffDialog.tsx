@@ -19,7 +19,7 @@ export function CreateStaffDialog({ onSuccess }: { onSuccess: () => void }) {
     phone: '',
     department: '',
     specialization: '',
-    role: 'doctor' // Default role
+    role: 'hospital_doctor' // Default role - use hospital_doctor to create doctor profile
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,7 +50,7 @@ export function CreateStaffDialog({ onSuccess }: { onSuccess: () => void }) {
 
       setFormData({ 
         fullName: '', email: '', password: '', phone: '', 
-        department: '', specialization: '', role: 'doctor' 
+        department: '', specialization: '', role: 'hospital_doctor' 
       });
       setOpen(false);
       onSuccess();
@@ -120,7 +120,8 @@ export function CreateStaffDialog({ onSuccess }: { onSuccess: () => void }) {
               >
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="doctor">Doctor</SelectItem>
+                  <SelectItem value="hospital_doctor">Hospital Doctor</SelectItem>
+                  <SelectItem value="online_doctor">Online Doctor</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
                   <SelectItem value="nurse">Nurse</SelectItem>
                 </SelectContent>
@@ -137,7 +138,7 @@ export function CreateStaffDialog({ onSuccess }: { onSuccess: () => void }) {
             </div>
           </div>
           
-          {formData.role === 'doctor' && (
+          {(formData.role === 'hospital_doctor' || formData.role === 'online_doctor') && (
             <>
               <div className="space-y-2">
                 <Label htmlFor="department">Department</Label>

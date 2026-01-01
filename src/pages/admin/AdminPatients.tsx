@@ -18,7 +18,7 @@ interface Patient {
   room_number: string | null;
   blood_type: string | null;
   admission_date: string | null;
-  condition: 'stable' | 'critical' | 'recovering' | null; // Added hypothetical field
+  assigned_doctor_id: string | null;
   profiles: {
     full_name: string;
     email: string;
@@ -257,7 +257,6 @@ export default function AdminPatients() {
                           <Badge 
                             variant="secondary" 
                             className={
-                              patient.condition === 'critical' ? 'bg-red-100 text-red-700 hover:bg-red-100' :
                               patient.room_number ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' : 
                               'bg-gray-100 text-gray-700 hover:bg-gray-100'
                             }
