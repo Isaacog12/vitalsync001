@@ -231,9 +231,11 @@ export default function BrowseDoctors() {
           <Card className="border-dashed border-2 bg-transparent shadow-none">
             <CardContent className="text-center py-12">
               <Stethoscope className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No doctors found</h3>
-              <p className="text-muted-foreground">
-                {search ? "Try adjusting your search filters." : "No doctors have been added to the system yet."}
+              <h3 className="text-lg font-semibold mb-2">No doctors available</h3>
+              <p className="text-muted-foreground max-w-md mx-auto">
+                {search 
+                  ? "Try adjusting your search filters." 
+                  : "No verified doctors are available at the moment. Please check back later or contact support."}
               </p>
             </CardContent>
           </Card>

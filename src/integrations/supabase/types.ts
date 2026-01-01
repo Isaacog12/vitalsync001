@@ -281,6 +281,74 @@ export type Database = {
           },
         ]
       }
+      doctor_change_requests: {
+        Row: {
+          created_at: string
+          current_doctor_id: string | null
+          id: string
+          patient_id: string
+          reason: string | null
+          requested_doctor_id: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_doctor_id?: string | null
+          id?: string
+          patient_id: string
+          reason?: string | null
+          requested_doctor_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_doctor_id?: string | null
+          id?: string
+          patient_id?: string
+          reason?: string | null
+          requested_doctor_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_change_requests_current_doctor_id_fkey"
+            columns: ["current_doctor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doctor_change_requests_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doctor_change_requests_requested_doctor_id_fkey"
+            columns: ["requested_doctor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doctor_change_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       doctor_profiles: {
         Row: {
           availability: Json | null
