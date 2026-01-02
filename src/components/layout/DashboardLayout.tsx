@@ -26,6 +26,7 @@ import {
   UserPlus,
   Video,
   Phone,
+  UserCog,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -39,6 +40,7 @@ const adminNavItems: NavItem[] = [
   { label: 'Dashboard', href: '/admin', icon: <LayoutDashboard className="h-5 w-5" /> },
   { label: 'Staff Management', href: '/admin/staff', icon: <Users className="h-5 w-5" /> },
   { label: 'Patients', href: '/admin/patients', icon: <Heart className="h-5 w-5" /> },
+  { label: 'Doctor Requests', href: '/admin/doctor-change-requests', icon: <UserCog className="h-5 w-5" /> },
   { label: 'Alerts', href: '/admin/alerts', icon: <Bell className="h-5 w-5" /> },
   { label: 'Settings', href: '/admin/settings', icon: <Settings className="h-5 w-5" /> },
 ];

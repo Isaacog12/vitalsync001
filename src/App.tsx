@@ -12,6 +12,7 @@ import StaffManagement from "./pages/admin/StaffManagement";
 import AdminPatients from "./pages/admin/AdminPatients";
 import AdminAlerts from "./pages/admin/AdminAlerts";
 import AdminSettings from "./pages/admin/AdminSettings";
+import DoctorChangeRequests from "./pages/admin/DoctorChangeRequests";
 // Hospital Doctor pages
 import HospitalDoctorDashboard from "./pages/hospital-doctor/HospitalDoctorDashboard";
 // Online Doctor pages
@@ -57,6 +58,7 @@ const App = () => (
             <Route path="/admin/patients" element={<AdminPatients />} />
             <Route path="/admin/alerts" element={<AdminAlerts />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
+            <Route path="/admin/doctor-change-requests" element={<DoctorChangeRequests />} />
             
             {/* Hospital Doctor routes */}
             <Route path="/hospital-doctor" element={<HospitalDoctorDashboard />} />

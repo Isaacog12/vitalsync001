@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Heart, Activity, Droplets, Thermometer, Phone, MessageSquare, User, Zap, Loader2, Stethoscope, Mail, RefreshCw, Building, CheckCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Heart, Activity, Droplets, Thermometer, Phone, MessageSquare, User, Zap, Loader2, Stethoscope, Mail, RefreshCw, Building, CheckCircle, Bell, XCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -36,6 +37,13 @@ interface Patient {
   assigned_doctor_id: string | null;
 }
 
+interface ChangeRequestNotification {
+  id: string;
+  status: string;
+  reviewed_at: string;
+  new_doctor_name?: string;
+}
+
 export default function PatientDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -48,6 +56,7 @@ export default function PatientDashboard() {
   const [changeReason, setChangeReason] = useState('');
   const [submittingRequest, setSubmittingRequest] = useState(false);
   const [hasPendingRequest, setHasPendingRequest] = useState(false);
+  const [notification, setNotification] = useState<ChangeRequestNotification | null>(null);
 
   useEffect(() => {
     if (user?.id) {
@@ -110,6 +119,41 @@ export default function PatientDashboard() {
           .maybeSingle();
 
         setHasPendingRequest(!!pendingRequest);
+
+        // Check for recently reviewed requests (notification)
+        const { data: reviewedRequest } = await supabase
+          .from('doctor_change_requests')
+          .select('id, status, reviewed_at, requested_doctor_id')
+          .eq('patient_id', patientData.id)
+          .in('status', ['approved', 'rejected'])
+          .order('reviewed_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (reviewedRequest?.reviewed_at) {
+          const reviewedDate = new Date(reviewedRequest.reviewed_at);
+          const now = new Date();
+          const hoursSinceReview = (now.getTime() - reviewedDate.getTime()) / (1000 * 60 * 60);
+          
+          // Show notification if reviewed in the last 48 hours
+          if (hoursSinceReview < 48) {
+            let newDoctorName = undefined;
+            if (reviewedRequest.status === 'approved' && reviewedRequest.requested_doctor_id) {
+              const { data: newDoc } = await supabase
+                .from('profiles')
+                .select('full_name')
+                .eq('id', reviewedRequest.requested_doctor_id)
+                .maybeSingle();
+              newDoctorName = newDoc?.full_name;
+            }
+            setNotification({
+              id: reviewedRequest.id,
+              status: reviewedRequest.status,
+              reviewed_at: reviewedRequest.reviewed_at,
+              new_doctor_name: newDoctorName,
+            });
+          }
+        }
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -209,6 +253,36 @@ export default function PatientDashboard() {
           </div>
         ) : (
           <>
+            {/* Notification for doctor change request */}
+            {notification && (
+              <Alert className={notification.status === 'approved' ? 'border-green-500/30 bg-green-500/5' : 'border-red-500/30 bg-red-500/5'}>
+                <div className="flex items-start gap-3">
+                  {notification.status === 'approved' ? (
+                    <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+                  ) : (
+                    <XCircle className="h-5 w-5 text-red-600 mt-0.5" />
+                  )}
+                  <div className="flex-1">
+                    <AlertDescription className={notification.status === 'approved' ? 'text-green-700' : 'text-red-700'}>
+                      {notification.status === 'approved' ? (
+                        <>Your doctor change request has been approved! {notification.new_doctor_name && `You've been assigned to ${notification.new_doctor_name}.`}</>
+                      ) : (
+                        <>Your doctor change request has been reviewed and was not approved at this time.</>
+                      )}
+                    </AlertDescription>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={() => setNotification(null)}
+                  >
+                    <XCircle className="h-4 w-4" />
+                  </Button>
+                </div>
+              </Alert>
+            )}
+
             {/* Vitals Grid */}
             {hasVitals ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
