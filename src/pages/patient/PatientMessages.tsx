@@ -16,6 +16,7 @@ interface Contact {
   role: string;
   department: string | null;
   unread_count: number;
+  isAssigned?: boolean;
 }
 
 export default function PatientMessages() {
@@ -32,15 +33,30 @@ export default function PatientMessages() {
 
   const fetchContacts = async () => {
     try {
+      // First get the patient's assigned doctor
+      const { data: patientData } = await supabase
+        .from('patients')
+        .select('assigned_doctor_id')
+        .eq('user_id', profile?.user_id)
+        .maybeSingle();
+
+      // Fetch doctors (hospital_doctor and online_doctor roles)
       const { data: doctors, error } = await supabase
         .from('profiles')
         .select('id, full_name, role, department')
-        .eq('role', 'doctor');
+        .in('role', ['hospital_doctor', 'online_doctor']);
 
       if (error) throw error;
 
+      // Sort to put assigned doctor first
+      const sortedDoctors = (doctors || []).sort((a, b) => {
+        if (a.id === patientData?.assigned_doctor_id) return -1;
+        if (b.id === patientData?.assigned_doctor_id) return 1;
+        return 0;
+      });
+
       const contactsWithUnread = await Promise.all(
-        (doctors || []).map(async (doctor) => {
+        sortedDoctors.map(async (doctor) => {
           const { count } = await supabase
             .from('messages')
             .select('*', { count: 'exact', head: true })
@@ -51,6 +67,7 @@ export default function PatientMessages() {
           return {
             ...doctor,
             unread_count: count || 0,
+            isAssigned: doctor.id === patientData?.assigned_doctor_id,
           };
         })
       );
@@ -109,7 +126,12 @@ export default function PatientMessages() {
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">{contact.full_name}</p>
+                          <p className="font-medium truncate">
+                            {contact.full_name}
+                            {contact.isAssigned && (
+                              <Badge variant="secondary" className="ml-2 text-xs">Your Doctor</Badge>
+                            )}
+                          </p>
                           <p className="text-sm text-muted-foreground capitalize">
                             {contact.department || 'Doctor'}
                           </p>
