@@ -1,7 +1,8 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -29,18 +30,20 @@ import {
   UserCog,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 interface NavItem {
   label: string;
   href: string;
   icon: ReactNode;
+  badgeKey?: string;
 }
 
 const adminNavItems: NavItem[] = [
   { label: 'Dashboard', href: '/admin', icon: <LayoutDashboard className="h-5 w-5" /> },
   { label: 'Staff Management', href: '/admin/staff', icon: <Users className="h-5 w-5" /> },
   { label: 'Patients', href: '/admin/patients', icon: <Heart className="h-5 w-5" /> },
-  { label: 'Doctor Requests', href: '/admin/doctor-change-requests', icon: <UserCog className="h-5 w-5" /> },
+  { label: 'Doctor Requests', href: '/admin/doctor-change-requests', icon: <UserCog className="h-5 w-5" />, badgeKey: 'pendingRequests' },
   { label: 'Alerts', href: '/admin/alerts', icon: <Bell className="h-5 w-5" /> },
   { label: 'Settings', href: '/admin/settings', icon: <Settings className="h-5 w-5" /> },
 ];
@@ -71,6 +74,35 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [badgeCounts, setBadgeCounts] = useState<Record<string, number>>({});
+
+  // Fetch pending doctor change requests count for admin
+  useEffect(() => {
+    if (role !== 'admin') return;
+
+    const fetchPendingCount = async () => {
+      const { count } = await supabase
+        .from('doctor_change_requests')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+      
+      setBadgeCounts(prev => ({ ...prev, pendingRequests: count || 0 }));
+    };
+
+    fetchPendingCount();
+
+    // Subscribe to changes
+    const channel = supabase
+      .channel('admin-pending-requests')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'doctor_change_requests' }, () => {
+        fetchPendingCount();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [role]);
 
   const navItems = role === 'admin' ? adminNavItems : role === 'doctor' ? doctorNavItems : patientNavItems;
 
@@ -137,7 +169,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   onClick={() => setSidebarOpen(false)}
                 >
                   {item.icon}
-                  {item.label}
+                  <span className="flex-1">{item.label}</span>
+                  {item.badgeKey && badgeCounts[item.badgeKey] > 0 && (
+                    <Badge 
+                      variant="secondary" 
+                      className={cn(
+                        "h-5 min-w-5 flex items-center justify-center text-xs",
+                        isActive ? "bg-primary-foreground/20 text-primary-foreground" : "bg-primary text-primary-foreground"
+                      )}
+                    >
+                      {badgeCounts[item.badgeKey]}
+                    </Badge>
+                  )}
                 </Link>
               );
             })}
